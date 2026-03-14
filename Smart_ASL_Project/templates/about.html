@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Smart ASL Recognition</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <i class="fas fa-hands"></i>
+                <span>Smart ASL</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="/about" class="active"><i class="fas fa-info-circle"></i> About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- About Hero -->
+    <section class="about-hero">
+        <h1>About <span class="highlight">Smart ASL</span></h1>
+        <p>Breaking communication barriers with artificial intelligence</p>
+    </section>
+
+    <main class="main-content about-content">
+        <!-- Project Overview -->
+        <section class="about-section">
+            <div class="about-card">
+                <div class="about-icon"><i class="fas fa-bullseye"></i></div>
+                <h2>Project Overview</h2>
+                <p>
+                    Smart ASL Recognition is a deep learning-powered system that translates American Sign Language (ASL)
+                    gestures into text in real-time. Using a combination of computer vision and neural networks,
+                    the system can recognize <strong>100 different ASL words</strong> from live webcam video.
+                </p>
+                <p>
+                    This project aims to bridge the communication gap between the deaf/hard-of-hearing community
+                    and those who don't understand sign language, making everyday interactions more accessible.
+                </p>
+            </div>
+        </section>
+
+        <!-- Technology Stack -->
+        <section class="about-section">
+            <h2 class="section-title"><i class="fas fa-layer-group"></i> Technology Stack</h2>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <i class="fab fa-python"></i>
+                    <h3>Python</h3>
+                    <p>Core programming language for backend processing and ML pipeline</p>
+                </div>
+                <div class="tech-card">
+                    <i class="fas fa-brain"></i>
+                    <h3>TensorFlow / Keras</h3>
+                    <p>Deep learning framework for building and training the LSTM model</p>
+                </div>
+                <div class="tech-card">
+                    <i class="fas fa-hand-paper"></i>
+                    <h3>MediaPipe</h3>
+                    <p>Google's framework for hand detection and landmark tracking</p>
+                </div>
+                <div class="tech-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>MobileNetV2</h3>
+                    <p>Lightweight CNN for efficient feature extraction from video frames</p>
+                </div>
+                <div class="tech-card">
+                    <i class="fas fa-eye"></i>
+                    <h3>OpenCV</h3>
+                    <p>Computer vision library for image processing and manipulation</p>
+                </div>
+                <div class="tech-card">
+                    <i class="fas fa-server"></i>
+                    <h3>Flask</h3>
+                    <p>Lightweight web framework serving the real-time prediction API</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Model Architecture -->
+        <section class="about-section">
+            <div class="about-card">
+                <div class="about-icon"><i class="fas fa-project-diagram"></i></div>
+                <h2>Model Architecture</h2>
+                <div class="architecture-flow">
+                    <div class="arch-step">
+                        <div class="arch-badge">Input</div>
+                        <p>13 consecutive video frames (224x224 pixels)</p>
+                    </div>
+                    <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="arch-step">
+                        <div class="arch-badge">Feature Extraction</div>
+                        <p>MobileNetV2 produces 1280-dimensional feature vectors per frame</p>
+                    </div>
+                    <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="arch-step">
+                        <div class="arch-badge">Sequence Model</div>
+                        <p>LSTM layers (256 → 128 units) process temporal patterns</p>
+                    </div>
+                    <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="arch-step">
+                        <div class="arch-badge">Output</div>
+                        <p>Dense layer with softmax outputs 100 class probabilities</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dataset Info -->
+        <section class="about-section">
+            <div class="about-card">
+                <div class="about-icon"><i class="fas fa-database"></i></div>
+                <h2>Dataset</h2>
+                <p>
+                    The model is trained on the <strong>WLASL (Word-Level American Sign Language)</strong> dataset,
+                    which contains video clips of 100 common ASL words. Each video is preprocessed into sequences
+                    of 13 frames, with data augmentation techniques including horizontal flipping, noise injection,
+                    and zooming to improve model robustness.
+                </p>
+                <div class="dataset-stats">
+                    <div class="ds-stat">
+                        <span class="ds-number">100</span>
+                        <span class="ds-label">ASL Words</span>
+                    </div>
+                    <div class="ds-stat">
+                        <span class="ds-number">13</span>
+                        <span class="ds-label">Frames/Sequence</span>
+                    </div>
+                    <div class="ds-stat">
+                        <span class="ds-number">4x</span>
+                        <span class="ds-label">Data Augmentation</span>
+                    </div>
+                    <div class="ds-stat">
+                        <span class="ds-number">1280</span>
+                        <span class="ds-label">Features/Frame</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How to Use -->
+        <section class="about-section">
+            <div class="about-card">
+                <div class="about-icon"><i class="fas fa-question-circle"></i></div>
+                <h2>How to Use</h2>
+                <ol class="usage-steps">
+                    <li>
+                        <strong>Start the Camera:</strong> Click the "Start Camera" button on the home page
+                        and allow browser access to your webcam.
+                    </li>
+                    <li>
+                        <strong>Position Your Hands:</strong> Make sure your hands are visible and well-lit.
+                        The system will indicate when it detects your hand.
+                    </li>
+                    <li>
+                        <strong>Perform the Sign:</strong> Sign an ASL word. The system needs 13 frames
+                        to make a prediction, so hold the sign briefly.
+                    </li>
+                    <li>
+                        <strong>View Results:</strong> The predicted word and confidence score appear
+                        in real-time on the prediction panel.
+                    </li>
+                    <li>
+                        <strong>Build Sentences:</strong> Use the sentence builder to combine
+                        predicted words into meaningful phrases, and use text-to-speech to hear them.
+                    </li>
+                </ol>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Smart ASL Recognition Project</p>
+            <p>Built with TensorFlow, MediaPipe, and Flask</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart ASL Recognition</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <i class="fas fa-hands"></i>
+                <span>Smart ASL</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/" class="active"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="/about"><i class="fas fa-info-circle"></i> About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Smart ASL <span class="highlight">Recognition</span></h1>
+            <p>Real-time American Sign Language detection powered by Deep Learning. Show your hand signs to the camera and get instant translations.</p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">100</span>
+                    <span class="stat-label">ASL Words</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">LSTM</span>
+                    <span class="stat-label">Deep Learning</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">Real-time</span>
+                    <span class="stat-label">Detection</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Camera Section -->
+        <section class="camera-section">
+            <div class="camera-container">
+                <div class="camera-header">
+                    <h2><i class="fas fa-video"></i> Live Camera Feed</h2>
+                    <div class="camera-controls">
+                        <button id="startBtn" class="btn btn-primary" onclick="startCamera()">
+                            <i class="fas fa-play"></i> Start Camera
+                        </button>
+                        <button id="stopBtn" class="btn btn-danger" onclick="stopCamera()" disabled>
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                        <button id="resetBtn" class="btn btn-secondary" onclick="resetPrediction()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <div class="camera-wrapper">
+                    <div class="video-container">
+                        <video id="webcam" autoplay playsinline></video>
+                        <canvas id="captureCanvas" style="display:none;"></canvas>
+                        <canvas id="overlayCanvas" class="overlay-canvas"></canvas>
+                        <div id="cameraOverlay" class="camera-overlay">
+                            <i class="fas fa-video fa-3x"></i>
+                            <p>Click "Start Camera" to begin</p>
+                        </div>
+                        <!-- Hand Detection Indicator -->
+                        <div id="handIndicator" class="hand-indicator hidden">
+                            <i class="fas fa-hand-paper"></i> Hand Detected
+                        </div>
+                        <!-- Frame Progress -->
+                        <div id="frameProgress" class="frame-progress hidden">
+                            <div class="progress-bar">
+                                <div id="progressFill" class="progress-fill"></div>
+                            </div>
+                            <span id="frameCount">0/13 frames</span>
+                        </div>
+                        <!-- Auto-add indicator -->
+                        <div id="autoAddIndicator" class="auto-add-indicator hidden">
+                            <i class="fas fa-magic"></i> Auto-adding...
+                        </div>
+                    </div>
+
+                    <!-- Prediction Panel -->
+                    <div class="prediction-panel">
+                        <div class="prediction-main">
+                            <h3>Predicted Sign</h3>
+                            <div id="predictionWord" class="prediction-word">
+                                <span class="waiting">Waiting...</span>
+                            </div>
+                            <div id="confidenceBar" class="confidence-container">
+                                <div class="confidence-label">Confidence</div>
+                                <div class="confidence-track">
+                                    <div id="confidenceFill" class="confidence-fill" style="width: 0%"></div>
+                                </div>
+                                <span id="confidenceValue" class="confidence-value">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="prediction-details">
+                            <h4>Top 3 Predictions</h4>
+                            <div id="top3List" class="top3-list">
+                                <div class="top3-item empty">
+                                    <span class="rank">#1</span>
+                                    <span class="word">—</span>
+                                    <span class="conf">—</span>
+                                </div>
+                                <div class="top3-item empty">
+                                    <span class="rank">#2</span>
+                                    <span class="word">—</span>
+                                    <span class="conf">—</span>
+                                </div>
+                                <div class="top3-item empty">
+                                    <span class="rank">#3</span>
+                                    <span class="word">—</span>
+                                    <span class="conf">—</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sentence Builder -->
+                        <div class="sentence-builder">
+                            <h4><i class="fas fa-comment-dots"></i> Sentence Builder</h4>
+                            <div id="sentenceDisplay" class="sentence-display">
+                                <span class="placeholder">Signs will appear here...</span>
+                            </div>
+                            <div class="sentence-controls">
+                                <button class="btn btn-sm btn-primary" onclick="addWordToSentence()" title="Enter">
+                                    <i class="fas fa-plus"></i> Add Word
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="undoLastWord()" title="Ctrl+Z">
+                                    <i class="fas fa-undo"></i> Undo
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="clearSentence()">
+                                    <i class="fas fa-trash"></i> Clear
+                                </button>
+                                <button class="btn btn-sm btn-accent" onclick="copySentence()" title="Ctrl+C">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                                <button class="btn btn-sm btn-accent" onclick="speakSentence()">
+                                    <i class="fas fa-volume-up"></i> Speak
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="status-bar">
+                            <div id="statusIndicator" class="status-dot offline"></div>
+                            <span id="statusText">Camera Off</span>
+                            <span id="fpsCounter" class="fps-counter" title="Processing speed"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prediction History Section -->
+        <section class="history-section">
+            <div class="history-header">
+                <h2><i class="fas fa-history"></i> Prediction History</h2>
+                <div class="history-controls">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="autoAddToggle" onchange="toggleAutoAdd()">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Auto-add to sentence</span>
+                    </label>
+                    <button class="btn btn-sm btn-secondary" onclick="clearHistory()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+            </div>
+            <div id="historyTimeline" class="history-timeline">
+                <div class="history-empty">
+                    <i class="fas fa-clock"></i>
+                    <p>Predictions will appear here as you sign</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Keyboard Shortcuts -->
+        <section class="shortcuts-section">
+            <details>
+                <summary><i class="fas fa-keyboard"></i> Keyboard Shortcuts</summary>
+                <div class="shortcuts-grid">
+                    <div class="shortcut"><kbd>Space</kbd> <span>Start / Stop Camera</span></div>
+                    <div class="shortcut"><kbd>R</kbd> <span>Reset Prediction Buffer</span></div>
+                    <div class="shortcut"><kbd>Enter</kbd> <span>Add Word to Sentence</span></div>
+                    <div class="shortcut"><kbd>Ctrl+Z</kbd> <span>Undo Last Word</span></div>
+                    <div class="shortcut"><kbd>Ctrl+Shift+C</kbd> <span>Copy Sentence</span></div>
+                    <div class="shortcut"><kbd>S</kbd> <span>Speak Sentence</span></div>
+                </div>
+            </details>
+        </section>
+
+        <!-- Supported Words Section -->
+        <section class="words-section">
+            <h2><i class="fas fa-language"></i> Supported ASL Words <span id="wordCount" class="badge">100</span></h2>
+            <div class="words-search">
+                <input type="text" id="wordSearch" placeholder="Search words..." oninput="filterWords()">
+                <i class="fas fa-search"></i>
+            </div>
+            <div id="wordGrid" class="word-grid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="how-it-works">
+            <h2><i class="fas fa-cogs"></i> How It Works</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>1. Capture</h3>
+                    <p>Your webcam captures video frames in real-time and sends them for processing.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">
+                        <i class="fas fa-hand-paper"></i>
+                    </div>
+                    <h3>2. Detect</h3>
+                    <p>MediaPipe detects hand landmarks and ensures a valid hand gesture is present.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>3. Analyze</h3>
+                    <p>MobileNetV2 extracts features from 13 consecutive frames to understand motion.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <h3>4. Predict</h3>
+                    <p>LSTM neural network processes the sequence and predicts the ASL word being signed.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Smart ASL Recognition Project</p>
+            <p>Built with TensorFlow, MediaPipe, and Flask</p>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- MediaPipe Hands CDN (client-side instant detection) -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js" crossorigin="anonymous"></script>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

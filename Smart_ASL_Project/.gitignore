@@ -1,0 +1,91 @@
+# .gitignore for Smart ASL Recognition
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+mp_env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+debug.log
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Pyre type checker
+.pyre/
+
+# Data, models, and results (customize as needed)
+*.h5
+*.keras
+*.npy
+*.npz
+*.csv
+*.pkl
+*.joblib
+*.log
+*.ckpt
+*.pb
+*.onnx
+*.tflite
+*.mlmodel
+*.pth
+*.pt
+*.weights
+
+# Large files and datasets
+dataset/
+processed_data/
+models/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/

@@ -1,0 +1,14 @@
+# Example requirements.txt for Smart ASL Recognition
+
+numpy
+opencv-python
+mediapipe
+tensorflow
+keras
+scikit-learn
+flask
+flask-cors
+matplotlib
+joblib
+h5py
+psutil
