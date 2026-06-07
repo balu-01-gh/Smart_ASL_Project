@@ -26,9 +26,8 @@ def load_split(name):
 
 X, y = load_split("pose")
 # Split 80/20
-split_idx = int(0.8 * len(X))
-X_train, X_val = X[:split_idx], X[split_idx:]
-y_train, y_val = y[:split_idx], y[split_idx:]
+from sklearn.model_selection import train_test_split
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=True)
 
 print(f"Train samples: {X_train.shape}")
 print(f"Val   samples: {X_val.shape}")

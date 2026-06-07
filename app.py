@@ -48,7 +48,7 @@ CORS(app)
 MODEL_PATH = "asl_robust_pose_model_89.keras"
 LABELS_PATH = "model_labels.json"  # Local copy if exists
 SCALER_PATH = "processed_data/feature_scaler.pkl"
-SEQ_LEN = 1
+SEQ_LEN = 13
 EARLY_PREDICT_MIN = 1        # Predict IMMEDIATELY (from 1st frame)
 IMG_SIZE = 224               # Match training size for best accuracy
 CONFIDENCE_THRESHOLD = 0.30  # Slightly lower to allow faster initial feedback
@@ -62,7 +62,7 @@ print("[INFO] Loading labels...")
 with open(LABELS_PATH, "r") as f:
     label_map = json.load(f)
 # Invert mapping: index (int) -> word (str)
-idx_to_label = {v: k for k, v in label_map.items()}
+idx_to_label = {int(k): v for k, v in label_map.items()}
 print(f"[INFO] Total classes: {len(idx_to_label)}")
 
 print("[INFO] Loading feature scaler...")
