@@ -241,8 +241,10 @@ def predict():
         # Prediction immediately from the first frame
         buf_len = len(sequence)
         seq_list = list(sequence)
-        # No padding needed since SEQ_LEN = 1
-        seq_input = np.expand_dims(seq_list, axis=0).astype("float32")
+        if buf_len < SEQ_LEN:
+            pad_frame = seq_list[-1]
+            seq_list.extend([pad_frame] * (SEQ_LEN - buf_len))
+        seq_input = np.expand_dims(seq_list[:SEQ_LEN], axis=0).astype("float32")
         preds = _model_fn(seq_input, training=False).numpy()[0]
         top_idx = int(np.argmax(preds))
         confidence = float(preds[top_idx])
@@ -359,9 +361,10 @@ def debug_test():
     import time
     # Create a blank test image
     test_img = np.zeros((480, 640, 3), dtype=np.uint8) + 200
+    mp_test_image = Image(image_format=ImageFormat.SRGB, data=test_img)
     with hands_lock:
         start = time.time()
-        result: HandLandmarkerResult = hand_landmarker.detect(test_img)
+        result: HandLandmarkerResult = hand_landmarker.detect(mp_test_image)
         elapsed = time.time() - start
     return jsonify({
         "mediapipe_working": True,
