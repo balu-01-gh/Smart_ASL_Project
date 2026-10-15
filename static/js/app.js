@@ -11,8 +11,10 @@ let stream = null;
 let isRunning = false;
 let currentPrediction = null;
 let sentence = [];
+let transcript = [];
 let missedFrames = 0;
 let autoAddEnabled = false;
+let autoSpeakEnabled = false;
 let stablePredictionCount = 0;
 let lastStablePrediction = null;
 let predictionHistory = [];
@@ -24,10 +26,13 @@ let mpHands = null;
 let mpCamera = null;
 let isSendingToServer = false;
 let lastLandmarks = [];
+let lastSpokenWord = null;
+let lastSpokenAt = 0;
 
 const CAPTURE_DELAY_MS = 100;   // 100ms → fills 13-frame buffer in ~1.3s instead of 6.5s
 const AUTO_ADD_THRESHOLD = 4;
 const MAX_HISTORY = 50;
+const SPEAK_COOLDOWN_MS = 1200;
 
 // =====================
 // DOM Elements
@@ -52,7 +57,9 @@ const stopBtn = document.getElementById("stopBtn");
 const fpsCounter = document.getElementById("fpsCounter");
 const autoAddIndicator = document.getElementById("autoAddIndicator");
 const autoAddToggle = document.getElementById("autoAddToggle");
+const autoSpeakToggle = document.getElementById("autoSpeakToggle");
 const historyTimeline = document.getElementById("historyTimeline");
+const transcriptDisplay = document.getElementById("transcriptDisplay");
 const toastContainer = document.getElementById("toastContainer");
 
 
@@ -373,6 +380,8 @@ function handleServerPrediction(data) {
 
         if (isNewPrediction) {
             addToHistory(data.prediction, data.confidence);
+            addToTranscript(data.prediction);
+            maybeSpeakWord(data.prediction);
             showToast(`Recognized: ${data.prediction}`, "success");
         }
 
@@ -638,12 +647,80 @@ function speakSentence() {
         return;
     }
     const text = sentence.join(" ");
+    speakText(text);
+    showToast("Speaking...", "info");
+}
+
+function toggleAutoSpeak() {
+    autoSpeakEnabled = autoSpeakToggle.checked;
+    if (!autoSpeakEnabled && ("speechSynthesis" in window)) {
+        window.speechSynthesis.cancel();
+    }
+    showToast(autoSpeakEnabled ? "Auto-speak enabled" : "Auto-speak disabled", "info");
+}
+
+function addToTranscript(word) {
+    if (!word) return;
+    transcript.push(word);
+    renderTranscript();
+}
+
+function renderTranscript() {
+    if (transcript.length === 0) {
+        transcriptDisplay.innerHTML = '<span class="placeholder">Recognized words will appear here in real time...</span>';
+        return;
+    }
+    transcriptDisplay.textContent = transcript.join(" ");
+}
+
+function clearTranscript() {
+    if (transcript.length === 0) return;
+    transcript = [];
+    renderTranscript();
+    showToast("Transcript cleared", "info");
+}
+
+function copyTranscript() {
+    if (transcript.length === 0) {
+        showToast("Nothing to copy", "error");
+        return;
+    }
+    const text = transcript.join(" ");
+    navigator.clipboard.writeText(text).then(() => {
+        showToast("Transcript copied!", "success");
+    }).catch(() => {
+        showToast("Copy failed", "error");
+    });
+}
+
+function speakTranscript() {
+    if (transcript.length === 0) {
+        showToast("Nothing to speak", "error");
+        return;
+    }
+    speakText(transcript.join(" "));
+    showToast("Speaking transcript...", "info");
+}
+
+function maybeSpeakWord(word) {
+    if (!autoSpeakEnabled || !word) return;
+    const now = performance.now();
+    if (word === lastSpokenWord && (now - lastSpokenAt) < SPEAK_COOLDOWN_MS) return;
+    lastSpokenWord = word;
+    lastSpokenAt = now;
+    speakText(word);
+}
+
+function speakText(text) {
+    if (!("speechSynthesis" in window)) {
+        showToast("Speech is not supported in this browser", "error");
+        return;
+    }
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.9;
     utterance.pitch = 1;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
-    showToast("Speaking...", "info");
 }
 
 
@@ -676,6 +753,12 @@ document.addEventListener("keydown", (e) => {
     if (e.code === "KeyS" && !e.ctrlKey && !e.shiftKey) {
         e.preventDefault();
         speakSentence();
+    }
+    if (e.code === "KeyV" && !e.ctrlKey && !e.shiftKey && autoSpeakToggle) {
+        e.preventDefault();
+        autoSpeakToggle.checked = !autoSpeakToggle.checked;
+        toggleAutoSpeak();
+        localStorage.setItem("autoSpeakEnabled", autoSpeakToggle.checked);
     }
 });
 
@@ -786,14 +869,25 @@ function drawHandLandmarks(landmarksList) {
 // =====================
 document.addEventListener("DOMContentLoaded", () => {
     loadWords();
+    renderTranscript();
 
     const savedAutoAdd = localStorage.getItem("autoAddEnabled");
     if (savedAutoAdd === "true") {
         autoAddEnabled = true;
         autoAddToggle.checked = true;
     }
+    const savedAutoSpeak = localStorage.getItem("autoSpeakEnabled");
+    if (savedAutoSpeak === "true" && autoSpeakToggle) {
+        autoSpeakEnabled = true;
+        autoSpeakToggle.checked = true;
+    }
 
     autoAddToggle.addEventListener("change", () => {
         localStorage.setItem("autoAddEnabled", autoAddToggle.checked);
     });
+    if (autoSpeakToggle) {
+        autoSpeakToggle.addEventListener("change", () => {
+            localStorage.setItem("autoSpeakEnabled", autoSpeakToggle.checked);
+        });
+    }
 });

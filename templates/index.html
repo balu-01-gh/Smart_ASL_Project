@@ -167,12 +167,37 @@
         <!-- Prediction History Section -->
         <section class="history-section">
             <div class="history-header">
+                <h2><i class="fas fa-align-left"></i> Live Transcript</h2>
+                <div class="history-controls">
+                    <button class="btn btn-sm btn-secondary" onclick="clearTranscript()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                    <button class="btn btn-sm btn-accent" onclick="copyTranscript()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <button class="btn btn-sm btn-accent" onclick="speakTranscript()">
+                        <i class="fas fa-volume-up"></i> Speak
+                    </button>
+                </div>
+            </div>
+            <div id="transcriptDisplay" class="sentence-display">
+                <span class="placeholder">Recognized words will appear here in real time...</span>
+            </div>
+        </section>
+
+        <section class="history-section">
+            <div class="history-header">
                 <h2><i class="fas fa-history"></i> Prediction History</h2>
                 <div class="history-controls">
                     <label class="toggle-label">
                         <input type="checkbox" id="autoAddToggle" onchange="toggleAutoAdd()">
                         <span class="toggle-slider"></span>
                         <span class="toggle-text">Auto-add to sentence</span>
+                    </label>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="autoSpeakToggle" onchange="toggleAutoSpeak()">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Auto-speak words</span>
                     </label>
                     <button class="btn btn-sm btn-secondary" onclick="clearHistory()">
                         <i class="fas fa-trash"></i> Clear
@@ -198,6 +223,7 @@
                     <div class="shortcut"><kbd>Ctrl+Z</kbd> <span>Undo Last Word</span></div>
                     <div class="shortcut"><kbd>Ctrl+Shift+C</kbd> <span>Copy Sentence</span></div>
                     <div class="shortcut"><kbd>S</kbd> <span>Speak Sentence</span></div>
+                    <div class="shortcut"><kbd>V</kbd> <span>Toggle Auto-Speak</span></div>
                 </div>
             </details>
         </section>

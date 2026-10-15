@@ -38,6 +38,8 @@ This preprocessing ensures the model is trained on high-quality, structured data
 - Pose-based ASL gesture recognition
 - LSTM/GRU sequence models
 - Real-time video prediction
+- Real-time transcript generation from recognized signs
+- Text-to-speech output (manual speak + auto-speak toggle)
 - Flask web interface
 - Group-aware data splitting to prevent data leakage
 
@@ -74,6 +76,8 @@ Smart_ASL_Project/
 - Access the web interface at `http://localhost:5000` after running the app.
 - Use `predict_video.py` for batch video predictions.
 - Use `train_model_pose_lstm.py` to retrain the model with new data.
+- Use the **Live Transcript** panel to collect recognized words continuously.
+- Use **Speak** or **Auto-speak words** to convert recognized text into voice in real time.
 
 ## Example
 To run the app and see a live demo:
@@ -97,6 +101,5 @@ Jayavarapu Bala Subrahmanyam
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
-
 
 

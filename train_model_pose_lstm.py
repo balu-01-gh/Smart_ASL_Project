@@ -27,10 +27,12 @@ def load_split(name):
 X, y = load_split("pose")
 # Split 80/20
 from sklearn.model_selection import train_test_split
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=True)
+X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.3, random_state=42, shuffle=True)
+X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42, shuffle=True)
 
 print(f"Train samples: {X_train.shape}")
 print(f"Val   samples: {X_val.shape}")
+print(f"Test  samples: {X_test.shape}")
 
 # ── Robust Normalization ──────────────────────────────────────────────────────
 # Fit scaler ONLY on training data
@@ -51,6 +53,12 @@ X_val_reshaped = X_val.reshape(-1, features)
 X_val_reshaped = scaler.transform(X_val_reshaped)
 X_val = X_val_reshaped.reshape(val_samples, timesteps, features)
 
+# Transform Test (using train statistics)
+test_samples, _, _ = X_test.shape
+X_test_reshaped = X_test.reshape(-1, features)
+X_test_reshaped = scaler.transform(X_test_reshaped)
+X_test = X_test_reshaped.reshape(test_samples, timesteps, features)
+
 # Save scaler for inference
 joblib.dump(scaler, os.path.join(DATA_DIR, "feature_scaler.pkl"))
 print("Scaler saved.")
@@ -62,7 +70,7 @@ class_weights = compute_class_weight(
     y=y_train
 )
 class_weights = dict(enumerate(class_weights))
-all_unique = np.unique(np.concatenate((y_train, y_val)))
+all_unique = np.unique(np.concatenate((y_train, y_val, y_test)))
 num_classes = int(all_unique.max()) + 1
 print(f"Labels range [0, {all_unique.max()}] classes: {len(all_unique)} max_classes: {num_classes}")
 
@@ -118,8 +126,9 @@ model.save("asl_pose_lstm.h5")
 
 best_val   = max(history.history["val_accuracy"])
 best_train = max(history.history["accuracy"])
+test_loss, test_acc = model.evaluate(X_test, y_test, verbose=0)
 print(f"\nTraining completed!")
 print(f"Best Train Accuracy : {best_train*100:.2f}%")
 print(f"Best Val   Accuracy : {best_val  *100:.2f}%")
-
+print(f"Test  Accuracy      : {test_acc  *100:.2f}%")
 
